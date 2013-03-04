@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<!--[if IE]>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+<![endif]-->
+<title>Cocytus Demo</title>
+<body>
+<h1>Cocytus Demo</h1>
+<p>
+$Id$
+</p>
+<div style="border:outset 1px; padding:0.5em">
+<textarea rows="24" style="width:100%;font-family:monospace">
+var v = 1;
+postMessage(v);
+g = 1;
+postMessage(g);
+</textarea
+><input type="submit" value="run"   onclick="rundom(this)"
+><input type="submit" value="clear" onclick="clsdom(this)"
+><pre></pre>
+</div>
+<pre id="rundomsrc"></pre>
+<h2>Master document remains unfrozen</h2>
+<input type="submit" value="alert(''.constructor.constructor('a', 'return a'))" onclick="eval(this.value)">
+<h2>No Global Variable</h2>
+<p>The obvious</p>
+<div style="border:outset 1px; padding:0.5em">
+<pre>
+var v = 1;
+postMessage(v);
+// it is okay to get existing global vars
+postMessage(Object.getOwnPropertyNames(this));
+// but you can't assign it...
+undefined = 1;  // global object is frozen
+postMessage(undefined);
+// or set new global variable
+g = 1;
+postMessage(g);
+</pre
+><input type="submit" value="run"   onclick="rundom(this)"
+><input type="submit" value="clear" onclick="clsdom(this)"
+><pre></pre>
+</div>
+<h2>No Eval</h2>
+<p>The obvious</p>
+<div style="border:outset 1px; padding:0.5em">
+<pre>
+postMessage(21+21);
+postMessage(eval("21+21"));
+</pre
+><input type="submit" value="run"   onclick="rundom(this)"
+><input type="submit" value="clear" onclick="clsdom(this)"
+><pre></pre>
+</div>
+<p>Less but still obvious</p>
+<div style="border:outset 1px; padding:0.5em">
+<pre>
+postMessage((function(){return 42})());
+postMessage((new Function("return 42"))());
+</pre
+><input type="submit" value="run"   onclick="rundom(this)"
+><input type="submit" value="clear" onclick="clsdom(this)"
+><pre></pre>
+</div>
+<p>Rather unobvious</p>
+<div style="border:outset 1px; padding:0.5em">
+<pre>
+postMessage((function(a){return a})(42));
+postMessage(''.constructor.constructor('a', 'return a')(42));
+</pre
+><input type="submit" value="run"   onclick="rundom(this)"
+><input type="submit" value="clear" onclick="clsdom(this)"
+><pre></pre>
+</div>
+
+<h2>Timeout</h2>
+<p>By Master</p>
+<div style="border:outset 1px; padding:0.5em">
+<pre>
+function(){
+    var n = 0
+    setInterval(function(){ postMessage(n++) }, 100);
+}
+</pre
+><input type="submit" value="run for 2000ms"   onclick="rundom(this, 2000)"
+><input type="submit" value="clear" onclick="clsdom(this)"
+><pre></pre>
+</div>
+<p>By Worker</p>
+<div style="border:outset 1px; padding:0.5em">
+<pre>
+function(){
+    var n = 0
+    setInterval(function(){ postMessage(n++) }, 100);
+    setTimeout(function(){ close() }, 500);
+}
+</pre
+><input type="submit" value="run for 2000ms"   onclick="rundom(this, 2000)"
+><input type="submit" value="clear" onclick="clsdom(this)"
+><pre></pre>
+</div>
+
+<h2>Source:</h2>
+<a target="_blank" href="cocytus.js">cocytus.js</a>
+<!--
+<iframe src="cocytus.js" type="text/plain" width="100%" height="640px"></iframe>
+-->
+<script src="cocytus.js"></script>
+<script id="rundom">
+rundom = function(that, timeout) {
+    var d    = document,
+        o2s  = function(o){ return JSON.stringify(o, null, 2) },
+        tn   = function(t){ return d.createTextNode(t) },
+        br   = function(){ return d.createElement('br') },
+        ein  = that.previousSibling,
+        eout = that.nextSibling.nextSibling;
+    Cocytus({
+        onmessage:function(ev) {
+            eout.appendChild(tn('message: '));
+            eout.appendChild(tn(o2s(ev.data)));
+            eout.appendChild(br());
+        },
+        onerror: function(ev) {
+            eout.appendChild(tn('error: '));
+            eout.appendChild(tn(o2s(ev.message)));
+            eout.appendChild(br());
+            this.terminate(); // to make Firefox Happier
+        }
+    }).run(ein.value || ein.innerText || ein.textContent, timeout);
+};
+clsdom = function(that){
+  that.nextSibling.innerHTML = '';
+};
+</script>
+<script>
+(function(global){
+    var $ = function(id){ return document.getElementById(id) };
+    $('rundomsrc').innerText = $('rundom').innerText;
+})(this);
+</script>
+</body>
+</html>
