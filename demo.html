@@ -15,8 +15,8 @@ $Id: demo.html,v 0.1 2013/03/04 11:41:48 dankogai Exp dankogai $
 <textarea rows="24" style="width:100%;font-family:monospace">
 var v = 1;
 postMessage(v);
-g = 1;
-postMessage(g);
+eval('v++');
+postMessage(v);
 </textarea
 ><input type="submit" value="run"   onclick="rundom(this)"
 ><input type="submit" value="clear" onclick="clsdom(this)"
@@ -24,17 +24,18 @@ postMessage(g);
 </div>
 <pre id="rundomsrc"></pre>
 <h2>Master document remains unfrozen</h2>
-<input type="submit" value="alert(''.constructor.constructor('a', 'return a'))" onclick="eval(this.value)">
+<p>Therefore the following works on document's context.</p>
+<input type="submit" value="alert(''.constructor.constructor('a', 'return a')(42))" onclick="eval(this.value)">
 <h2>No Global Variable</h2>
-<p>The obvious</p>
+<p>Implemented by <code>Object.freeze()</code>.  Unfortunately for Opera (as of 12), this does not work.</p>
 <div style="border:outset 1px; padding:0.5em">
 <pre>
 var v = 1;
 postMessage(v);
 // it is okay to get existing global vars
 postMessage(Object.getOwnPropertyNames(this));
-// but you can't assign it...
-undefined = 1;  // global object is frozen
+// but you can't assign it (unless opera)
+undefined = true;  // global object is frozen
 postMessage(undefined);
 // or set new global variable
 g = 1;
@@ -77,6 +78,7 @@ postMessage(''.constructor.constructor('a', 'return a')(42));
 </div>
 
 <h2>Timeout</h2>
+<p>Works except for Opera.</p>
 <p>By Master</p>
 <div style="border:outset 1px; padding:0.5em">
 <pre>

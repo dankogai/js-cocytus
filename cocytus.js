@@ -1,5 +1,5 @@
 /*
- * $Id: cocytus.js,v 0.1 2013/03/04 11:41:48 dankogai Exp dankogai $
+ * $Id: cocytus.js,v 0.2 2013/03/06 03:08:53 dankogai Exp dankogai $
  *
  *  Licensed under the MIT license.
  *  http://www.opensource.org/licenses/mit-license.php
@@ -37,8 +37,17 @@
         delete global.Worker;
         delete global.SharedWorker;
         delete global.eval;
-        if (global.uneval) Object.seal(global);     // Firefox
-        else               Object.freeze(global);   // anything else
+        if (global.navigator) {
+            if (global.navigator.userAgent.match(/\bOpera\b/i)) {
+                global.setTimeout  = function(){
+                    throw 'Cocytus forbids setTimeout() on Opera'
+                };
+                global.setInterval = function(){
+                    throw 'Cocytus forbids setInterval() on Opera'
+                };
+            }
+        }
+        Object.freeze(global);
     } else { // I'm a browser document
         if (!global.Worker) throw 'Web Worker unsupported';
         var scripts = document.getElementsByTagName('script'),
@@ -57,14 +66,11 @@
             };
             worker.timeout = 1000; // ms
             worker.run = function (work, timeout) {
-                this.postMessage('' + work);
                 if (!timeout) timeout = 0 + this.timeout;
-                if (timeout) {
-                    var that = this;
-                    setTimeout(function () {
-                        that.terminate()
-                    }, timeout);
-                }
+                if (timeout) setTimeout(function () {
+                    worker.terminate()
+                }, timeout);
+                this.postMessage('' + work);
             };
             if (Object(o) === o) for (var p in o) worker[p] = o[p];
             return worker;
