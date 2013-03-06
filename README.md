@@ -22,13 +22,15 @@ DESCRIPTION
 
 Cocytus provides a JavaScript sandbox.  In cocytus:
 
-+ global variables are forbidden
-+ any form of `eval()` is forbidden
-  + including `new Function()`
-  + and `.constructor.constuctor` which points to `Function`
-+ workers are terminated on timeout
++ global variables are forbidden.
++ any form of `eval()` is forbidden.
+  + including `new Function()`.
+  + and _anything_`.constructor.constuctor` which points to `Function`
++ workers are terminated on timeout.
+  + defaults to 1000ms.
+  + configurable, of course.
 
-See demo.html for details
+See demo.html for details.
 
 COMPATIBILITIES
 ---------------
@@ -46,8 +48,8 @@ Works okay:
 Works with issues:
 
 + Opera 12
-  + Global variables cannot be forbidden
-  + `setInterval()` and `setTimeout()` are not available
+  + Global variables cannot be forbidden.
+  + `setInterval()` and `setTimeout()` are not available.
 
 Doew not work:
 
@@ -62,3 +64,14 @@ Doew not work:
 
 http://dev.opera.com/articles/view/web-workers-rise-up/
 > Opera is built as a single-threaded browser with support for a wide variety of platforms, so our current implementation of Web Workers interleaves code execution in the single UI thread.
+
+WHY COCYTUS?
+------------
+
+Cocytus is made possible by `Object.freeze()`.  What else can it be?
+
+http://en.wikipedia.org/wiki/Cocytus
+
+> Inferno, the first cantica of Dante's Divine Comedy, Cocytus is the ninth and lowest circle of Hell
+> ...
+> Cocytus is referred to as a frozen lake rather than a river...
